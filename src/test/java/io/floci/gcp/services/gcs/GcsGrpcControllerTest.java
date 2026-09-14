@@ -94,7 +94,7 @@ class GcsGrpcControllerTest {
     }
 
     @Test
-    void everyBucketResponseCarriesBucketId() {
+    void everyBucketResponseCarriesBucketIdAndProjectNumber() {
         RecordingObserver<Bucket> created = new RecordingObserver<>();
         controller.createBucket(CreateBucketRequest.newBuilder()
                 .setParent("projects/_")
@@ -103,6 +103,8 @@ class GcsGrpcControllerTest {
                 .build(), created);
         assertNull(created.error);
         assertEquals("bucket-id-bucket", created.single().getBucketId());
+        assertEquals("projects/1", created.single().getProject());
+        assertEquals("test-project", service.getBucket("bucket-id-bucket").getProjectId());
 
         RecordingObserver<Bucket> fetched = new RecordingObserver<>();
         controller.getBucket(GetBucketRequest.newBuilder()
@@ -110,6 +112,7 @@ class GcsGrpcControllerTest {
                 .build(), fetched);
         assertNull(fetched.error);
         assertEquals("bucket-id-bucket", fetched.single().getBucketId());
+        assertEquals("projects/1", fetched.single().getProject());
 
         RecordingObserver<ListBucketsResponse> listed = new RecordingObserver<>();
         controller.listBuckets(ListBucketsRequest.newBuilder()
@@ -118,6 +121,8 @@ class GcsGrpcControllerTest {
         assertNull(listed.error);
         assertEquals(List.of("bucket-id-bucket"),
                 listed.single().getBucketsList().stream().map(Bucket::getBucketId).toList());
+        assertEquals(List.of("projects/1"),
+                listed.single().getBucketsList().stream().map(Bucket::getProject).toList());
 
         RecordingObserver<Bucket> updated = new RecordingObserver<>();
         controller.updateBucket(UpdateBucketRequest.newBuilder()
@@ -126,6 +131,7 @@ class GcsGrpcControllerTest {
                 .build(), updated);
         assertNull(updated.error);
         assertEquals("bucket-id-bucket", updated.single().getBucketId());
+        assertEquals("projects/1", updated.single().getProject());
     }
 
     @Test
