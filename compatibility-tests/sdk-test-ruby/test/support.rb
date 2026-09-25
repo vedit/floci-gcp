@@ -28,4 +28,3 @@ module Fixtures
     Net::HTTP.start(uri.host, uri.port, open_timeout: 5, read_timeout: 15) { |c| c.request(request) }
   end
 end
-
